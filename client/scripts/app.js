@@ -5,7 +5,11 @@ var Movie = Backbone.Model.extend({
   },
 
   toggleLike: function() {
-    // your code here
+    // Saving initial state of like property
+    var startingLike = this.get('like');
+
+    // Setting like property to opposite of initial state
+    this.set({like: !startingLike});
   }
 
 });
@@ -15,13 +19,18 @@ var Movies = Backbone.Collection.extend({
   model: Movie,
 
   initialize: function() {
-    // your code here
+    // For any attribute change on a Movie instance, initiate new sort
+    this.on('change', this.sort);
   },
 
   comparator: 'title',
 
   sortByField: function(field) {
-    // your code here
+    // Reset the comparator to be field passed-in
+    this.comparator = field;
+
+    // Sort the collection now that the comparator's been reset
+    this.sort();
   }
 
 });
@@ -58,7 +67,12 @@ var MovieView = Backbone.View.extend({
                         </div>'),
 
   initialize: function() {
-    // your code here
+    // var viewThis = this;
+    // this.model.on('change', viewThis.render.bind(viewThis));
+
+    // Callback function needs to be passed context explicitly.
+    // You can do this like in lines 70-71 or passing 'this' as context to .on()
+    this.model.on('change', this.render, this);
   },
 
   events: {
@@ -66,7 +80,8 @@ var MovieView = Backbone.View.extend({
   },
 
   handleClick: function() {
-    // your code here
+    this.model.toggleLike();
+    this.render();
   },
 
   render: function() {
@@ -79,7 +94,12 @@ var MovieView = Backbone.View.extend({
 var MoviesView = Backbone.View.extend({
 
   initialize: function() {
-    // your code here
+    // var moviesViewThis = this;
+    // this.collection.on('sort', moviesViewThis.render.bind(moviesViewThis));
+
+    // Callback function needs to be passed context explicitly.
+    // You can do this like in lines 94-95 or passing 'this' as context to .on()
+    this.collection.on('sort', this.render, this);
   },
 
   render: function() {
